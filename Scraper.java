@@ -3,11 +3,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Scraper {
     private String source;
     private int searchDistance;
     private Map<String, Set<String>> adjList;
+    Set<String> nodes;
+    private final String baseURL = "https://en.wikipedia.org/";
 
     /**
      * Constructor that takes in source URL and search distance
@@ -17,9 +21,16 @@ public class Scraper {
     public Scraper(String s, int d) {
         source = s;
         searchDistance = d;
+        adjList = new HashMap<>();
+        nodes = new HashSet<>();
         scrape();
     }
 
+    /**
+     * Fetch contents of a page given URL
+     * @param target URL of page
+     * @return list of all content strings
+     */
     private static List<String> fetchPageContents(String target) {
         List<String> contents = new ArrayList<>();
         try {
@@ -38,36 +49,58 @@ public class Scraper {
     }
 
     /**
-     *
+     * Gets all URLs to other articles from current page
+     * @param url the URL to the current page
+     * @return a list with URLs to other articles
      */
     private List<String> getNeighbors(String url) {
-        throw new UnsupportedOperationException();
+        List<String> neighbors = new ArrayList<>();
+        List<String> contents = fetchPageContents(url);
+        Pattern childPattern = Pattern.compile("<a href=\"/(wiki[^:\\r\\n\\t\\f\\v]*?)\"");
+        for (String line : contents) {
+            Matcher matcher = childPattern.matcher(line);
+            while (matcher.find()) {
+                String value = matcher.group(1);
+                if (value.length() >= 14 && value.substring(0, 14).equals("wiki/Wikipedia")
+                   || value.equals("wiki/Main_Page")) {
+                    continue;
+                }
+                neighbors.add(baseURL + value);
+            }
+        }
+        return neighbors;
     }
 
     /**
-     *
+     * Creates an adjacency list by scraping from source through a BFS
      */
     public void scrape() {
         List<String> queue = new LinkedList<>();
         queue.add(source);
         Set<String> visited = new HashSet<>();
         visited.add(source);
+        nodes.add(source);
         for (int i = 0; i < searchDistance; ++i) {
+            List<String> tempQueue = new LinkedList<>();
             while (!queue.isEmpty()) {
                 String curr = queue.get(0);
                 queue.remove(0);
                 List<String> neighbors = getNeighbors(curr);
+                System.out.println("par " + curr);
                 for (String nxt : neighbors) {
+                    System.out.println(nxt);
                     if (!visited.contains(nxt)) {
                         if (!adjList.containsKey(curr)) {
                             adjList.put(curr, new HashSet<>());
                         }
                         adjList.get(curr).add(nxt);
+                        nodes.add(nxt);
                         visited.add(nxt);
-                        queue.add(nxt);
+                        tempQueue.add(nxt);
                     }
                 }
             }
+            queue = tempQueue;
         }
     }
 
@@ -76,6 +109,7 @@ public class Scraper {
      * @return
      */
     public Map<String, Set<String>> getAdjList() {
+        System.out.println(nodes.size());
         throw new UnsupportedOperationException();
     }
 }
