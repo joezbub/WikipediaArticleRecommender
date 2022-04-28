@@ -11,7 +11,10 @@ public class Scraper {
     private int searchDistance;
     private Map<String, Set<String>> adjList;
     Set<String> nodes;
+    private List<String> bannedSections;
+
     private final String baseURL = "https://en.wikipedia.org/";
+    private final int numberOfSamples = 20; //80
 
     /**
      * Constructor that takes in source URL and search distance
@@ -23,6 +26,16 @@ public class Scraper {
         searchDistance = d;
         adjList = new HashMap<>();
         nodes = new HashSet<>();
+        bannedSections = new ArrayList<>(
+                Arrays.asList(
+                        "id=\"External_links\">External links</span>",
+                        "id=\"References\">References</span>",
+                        "id=\"Notes\">Notes</span>",
+                        "id=\"Further_reading\">Further reading</span>",
+                        "id=\"Explanatory_notes\">Explanatory notes</span>",
+                        "id=\"Citations\">Citations</span>"
+                )
+        );
         scrape();
     }
 
@@ -49,21 +62,30 @@ public class Scraper {
     }
 
     /**
-     * Gets all URLs to other articles from current page
+     * Randomly samples URLs from current page
      * @param url the URL to the current page
-     * @return a list with URLs to other articles
+     * @return a set of URLs to other articles
      */
-    private List<String> getNeighbors(String url) {
+    private Set<String> getNeighbors(String url) {
         List<String> neighbors = new ArrayList<>();
+        Set<String> sample = new HashSet<>();
         List<String> contents = fetchPageContents(url);
-        Pattern childPattern = Pattern.compile("<a href=\"/(wiki[^:\\r\\n\\t\\f\\v]*?)\"");
+        Pattern childPattern = Pattern.compile(
+                "<a href=\"/(wiki[^:\\r\\n\\t\\f\\v]*?)\""
+        );
+//        for (String line : contents) {
+//            System.out.println(line);
+//            System.out.println("line");
+//        }
         for (String line : contents) {
-            System.out.println(line);
-            System.out.println("line");
-        }
-        for (String line : contents) {
-            if (line.contains("id=\"External_links\">External links</span>") ||
-                    line.contains("id=\"References\">References</span>")) {
+            boolean done = false;
+            for (String html : bannedSections) {
+                if (line.contains(html)) {
+                    done = true;
+                    break;
+                }
+            }
+            if (done) {
                 break;
             }
             Matcher matcher = childPattern.matcher(line);
@@ -77,7 +99,13 @@ public class Scraper {
                 neighbors.add(baseURL + value);
             }
         }
-        return neighbors;
+        Collections.shuffle(neighbors);
+        int i = 0;
+        while (i < neighbors.size() && sample.size() < numberOfSamples) {
+            sample.add(neighbors.get(i));
+            i++;
+        }
+        return sample;
     }
 
     /**
@@ -94,8 +122,8 @@ public class Scraper {
             while (!queue.isEmpty()) {
                 String curr = queue.get(0);
                 queue.remove(0);
-                List<String> neighbors = getNeighbors(curr);
-                System.out.println("par " + curr);
+                Set<String> neighbors = getNeighbors(curr);
+                System.out.println("par; " + curr);
                 for (String nxt : neighbors) {
                     System.out.println(nxt);
                     if (!visited.contains(nxt)) {
@@ -114,11 +142,11 @@ public class Scraper {
     }
 
     /**
-     *
-     * @return
+     * Getter method for the adjacency list
+     * @return the adjacency list
      */
     public Map<String, Set<String>> getAdjList() {
         System.out.println(nodes.size());
-        throw new UnsupportedOperationException();
+        return adjList;
     }
 }

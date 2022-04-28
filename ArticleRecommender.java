@@ -21,7 +21,10 @@ public class ArticleRecommender {
     public static void main(String[] args) {
         System.out.println("Wikipedia Article Recommender:");
         input();
+        long start = System.nanoTime();
         Scraper sc = new Scraper(source, searchDistance);
         Map<String, Set<String>> adjList = sc.getAdjList();
+        long end = System.nanoTime();
+        System.out.println((end - start) / 1e9);
     }
 }
