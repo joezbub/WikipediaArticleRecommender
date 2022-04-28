@@ -14,7 +14,7 @@ public class Scraper {
     private List<String> bannedSections;
 
     private final String baseURL = "https://en.wikipedia.org/";
-    private final int numberOfSamples = 20; //80
+    private final int numberOfSamples = 20;
 
     /**
      * Constructor that takes in source URL and search distance
