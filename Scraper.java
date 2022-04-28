@@ -58,11 +58,20 @@ public class Scraper {
         List<String> contents = fetchPageContents(url);
         Pattern childPattern = Pattern.compile("<a href=\"/(wiki[^:\\r\\n\\t\\f\\v]*?)\"");
         for (String line : contents) {
+            System.out.println(line);
+            System.out.println("line");
+        }
+        for (String line : contents) {
+            if (line.contains("id=\"External_links\">External links</span>") ||
+                    line.contains("id=\"References\">References</span>")) {
+                break;
+            }
             Matcher matcher = childPattern.matcher(line);
             while (matcher.find()) {
                 String value = matcher.group(1);
                 if (value.length() >= 14 && value.substring(0, 14).equals("wiki/Wikipedia")
-                   || value.equals("wiki/Main_Page")) {
+                   || value.equals("wiki/Main_Page") || value.contains("Glossary_of_")
+                    || value.contains("List_of_")) {
                     continue;
                 }
                 neighbors.add(baseURL + value);
