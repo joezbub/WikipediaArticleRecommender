@@ -10,7 +10,6 @@ public class Scraper {
     private String source;
     private int searchDistance;
     private Map<String, Set<String>> adjList;
-    Set<String> nodes;
     private List<String> bannedSections;
 
     private final String baseURL = "https://en.wikipedia.org/";
@@ -25,7 +24,6 @@ public class Scraper {
         source = s;
         searchDistance = d;
         adjList = new HashMap<>();
-        nodes = new HashSet<>();
         bannedSections = new ArrayList<>(
                 Arrays.asList(
                         "id=\"External_links\">External links</span>",
@@ -116,22 +114,21 @@ public class Scraper {
         queue.add(source);
         Set<String> visited = new HashSet<>();
         visited.add(source);
-        nodes.add(source);
+        adjList.put(source, new HashSet<>());
         for (int i = 0; i < searchDistance; ++i) {
             List<String> tempQueue = new LinkedList<>();
             while (!queue.isEmpty()) {
                 String curr = queue.get(0);
                 queue.remove(0);
                 Set<String> neighbors = getNeighbors(curr);
-                System.out.println("par; " + curr);
+                System.out.println("par: " + curr);
                 for (String nxt : neighbors) {
                     System.out.println(nxt);
                     if (!visited.contains(nxt)) {
-                        if (!adjList.containsKey(curr)) {
-                            adjList.put(curr, new HashSet<>());
+                        if (!adjList.containsKey(nxt)) {
+                            adjList.put(nxt, new HashSet<>());
                         }
                         adjList.get(curr).add(nxt);
-                        nodes.add(nxt);
                         visited.add(nxt);
                         tempQueue.add(nxt);
                     }
@@ -146,7 +143,6 @@ public class Scraper {
      * @return the adjacency list
      */
     public Map<String, Set<String>> getAdjList() {
-        System.out.println(nodes.size());
         return adjList;
     }
 }

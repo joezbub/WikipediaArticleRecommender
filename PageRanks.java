@@ -1,7 +1,14 @@
 import java.util.*;
 
 public class PageRanks {
-
+    /**
+     * Method to rank Wikipedia articles based on page ranks
+     * @param adjList adjacency list of Wikipedia articles
+     * @param teleport
+     * @param MOE margin of error
+     * @param iters max iterations
+     * @return an array of ranked URLs
+     */
     public static String[] getPageRank(Map<String, Set<String>> adjList, double teleport, double MOE, int iters) {
         HashMap<String, Integer> indices = new HashMap<>();
         HashMap<Integer, String> urls = new HashMap<>();
@@ -46,6 +53,10 @@ public class PageRanks {
 
         Arrays.sort(rankEntries, Comparator.comparing(o -> -1 * o.value));
 
+        for (Entry e : rankEntries) {
+            System.out.println(e.key + " " + e.value);
+        }
+
         String[] rankedUrls = new String[rankEntries.length];
 
         for (int i = 0; i < rankedUrls.length; i++) {
@@ -56,6 +67,15 @@ public class PageRanks {
 
     }
 
+    /**
+     * Helper method for getPageRanks()
+     * @param currIter
+     * @param MOE margin of error
+     * @param maxIters max iterations
+     * @param input
+     * @param matrix
+     * @return ranks of the URLs
+     */
     static double[] run(
             int currIter, double MOE, int maxIters,
             double[] input, double[][] matrix) {

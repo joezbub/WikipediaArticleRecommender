@@ -24,7 +24,12 @@ public class ArticleRecommender {
         long start = System.nanoTime();
         Scraper sc = new Scraper(source, searchDistance);
         Map<String, Set<String>> adjList = sc.getAdjList();
+        String[] ranks = PageRanks.getPageRank(adjList, 0.1, 0.01, 100);
+//        for (String url : ranks) {
+//            System.out.println(url);
+//        }
         long end = System.nanoTime();
-        System.out.println((end - start) / 1e9);
+        System.out.println(adjList.size() + " nodes");
+        System.out.println((end - start) / 1e9 + " seconds");
     }
 }
