@@ -10,7 +10,7 @@ public class Scraper {
     private String source;
     private int searchDistance;
     private Map<String, Set<String>> adjList;
-    private List<String> bannedSections;
+    private List<String> endSections;
 
     private final String baseURL = "https://en.wikipedia.org/";
     private final int numberOfSamples = 20;
@@ -24,14 +24,18 @@ public class Scraper {
         source = s;
         searchDistance = d;
         adjList = new HashMap<>();
-        bannedSections = new ArrayList<>(
+        endSections = new ArrayList<>(
                 Arrays.asList(
                         "id=\"External_links\">External links</span>",
                         "id=\"References\">References</span>",
                         "id=\"Notes\">Notes</span>",
                         "id=\"Further_reading\">Further reading</span>",
                         "id=\"Explanatory_notes\">Explanatory notes</span>",
-                        "id=\"Citations\">Citations</span>"
+                        "id=\"Citations\">Citations</span>",
+                        "id=\"Bibliography\">Bibliography</span>",
+                        "id=\"Footnotes\">Footnotes</span>",
+                        "id=\"References_and_notes\">References and notes</span>",
+                        "id=\"Notes_and_references\">Notes and references</span>"
                 )
         );
         scrape();
@@ -77,7 +81,7 @@ public class Scraper {
 //        }
         for (String line : contents) {
             boolean done = false;
-            for (String html : bannedSections) {
+            for (String html : endSections) {
                 if (line.contains(html)) {
                     done = true;
                     break;
@@ -112,8 +116,6 @@ public class Scraper {
     public void scrape() {
         List<String> queue = new LinkedList<>();
         queue.add(source);
-        Set<String> visited = new HashSet<>();
-        visited.add(source);
         adjList.put(source, new HashSet<>());
         for (int i = 0; i < searchDistance; ++i) {
             List<String> tempQueue = new LinkedList<>();
@@ -124,14 +126,11 @@ public class Scraper {
                 System.out.println("par: " + curr);
                 for (String nxt : neighbors) {
                     System.out.println(nxt);
-                    if (!visited.contains(nxt)) {
-                        if (!adjList.containsKey(nxt)) {
-                            adjList.put(nxt, new HashSet<>());
-                        }
-                        adjList.get(curr).add(nxt);
-                        visited.add(nxt);
-                        tempQueue.add(nxt);
+                    if (!adjList.containsKey(nxt)) {
+                        adjList.put(nxt, new HashSet<>());
                     }
+                    adjList.get(curr).add(nxt);
+                    tempQueue.add(nxt);
                 }
             }
             queue = tempQueue;
