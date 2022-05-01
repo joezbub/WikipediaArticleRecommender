@@ -1,0 +1,17 @@
+Our project name is Wikipedia Article Recommendation. Wikipedia Article
+Recommendation is an implementation project that contains the following categories: Graph and Graph
+Algorithms, Information Networks, Document Search, and Advanced topics (PageRank). Our project
+is an interactive Java program that prompts the user for a source URL from Wikipedia,
+and recommends popular articles based on this source URL and a few other user-inputted parameters.
+These parameters are a search distance k, the number of links sampled per page n, and a number of
+recommended articles r. Because visiting each link on each Wikipedia page would take too long,
+we randomly sample n links on each page instead, and we continue the BFS on each page until
+we have hit k links away from the source URL. After visiting each page, the program calculates
+the PageRank for each article, and outputs the r articles with the highest PageRank as
+recommendations.
+
+The work breakdown goes as follows. Joseph and Vongdara parsed the user input and connected to
+the source URL to get a list of articles. Joseph ran BFS from the source URL and created a
+directed edge list of articles that are at most k distance from the source URL. Alessandro
+developed and ran the PageRank algorithm, and Alessandro and Vongdara worked on returning
+the top articles based on their PageRank and the user input.

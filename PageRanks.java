@@ -53,9 +53,9 @@ public class PageRanks {
 
         Arrays.sort(rankEntries, Comparator.comparing(o -> -1 * o.value));
 
-        for (Entry e : rankEntries) {
-            System.out.println(e.key + " " + e.value);
-        }
+//        for (Entry e : rankEntries) {
+//            System.out.println(e.key + " " + e.value);
+//        }
 
         String[] rankedUrls = new String[rankEntries.length];
 

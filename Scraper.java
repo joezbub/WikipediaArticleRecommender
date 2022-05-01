@@ -13,16 +13,17 @@ public class Scraper {
     private List<String> endSections;
 
     private final String baseURL = "https://en.wikipedia.org/";
-    private final int numberOfSamples = 20;
+    private int numberOfSamples;
 
     /**
      * Constructor that takes in source URL and search distance
      * @param s Source URL
      * @param d Search distance
      */
-    public Scraper(String s, int d) {
+    public Scraper(String s, int d, int n) {
         source = s;
         searchDistance = d;
+        numberOfSamples = n;
         adjList = new HashMap<>();
         endSections = new ArrayList<>(
                 Arrays.asList(
@@ -123,9 +124,9 @@ public class Scraper {
                 String curr = queue.get(0);
                 queue.remove(0);
                 Set<String> neighbors = getNeighbors(curr);
-                System.out.println("par: " + curr);
+                // System.out.println("par: " + curr);
                 for (String nxt : neighbors) {
-                    System.out.println(nxt);
+                    // System.out.println(nxt);
                     if (!adjList.containsKey(nxt)) {
                         adjList.put(nxt, new HashSet<>());
                     }
